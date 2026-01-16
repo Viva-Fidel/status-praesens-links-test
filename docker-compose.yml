@@ -1,0 +1,59 @@
+networks:
+  status-praesens-test-network:
+    name: status-praesens-test-network
+    driver: bridge
+
+services:
+  redis:
+    image: redis:8.4.0
+    container_name: redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - status-praesens-test-network
+
+  postgres:
+    image: postgres:18
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - status-praesens-test-network
+
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      bash -c "
+      python manage.py collectstatic --no-input &&
+      gunicorn -c gunicorn_config.py link_shortener.wsgi:application
+      "
+    working_dir: /app
+    ports:
+      - "8000:8000"
+    networks:
+      - status-praesens-test-network
+
+volumes:
+  postgres_data:
+  redis_data:
+

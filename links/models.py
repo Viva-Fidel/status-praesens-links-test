@@ -16,15 +16,11 @@ class ShortLink(models.Model):
 
     original_link = models.URLField(max_length=2048, verbose_name="Оригинальная ссылка")
 
-    is_active = models.BooleanField(default=True, verbose_name="Активна")
-
     clicks_count = models.PositiveIntegerField(
         default=0, verbose_name="Количество переходов"
     )
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
-
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
 
     class Meta:
         verbose_name = "Короткая ссылка"
