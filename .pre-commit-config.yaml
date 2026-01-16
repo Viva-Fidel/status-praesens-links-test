@@ -1,0 +1,16 @@
+exclude: 'migrations|static|env'
+repos:
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.14.11
+  hooks:
+    - id: ruff
+      exclude: __init__.py
+    - id: ruff-format
+      exclude: __init__.py
+
+-   repo: https://github.com/pycqa/isort
+    rev: 7.0.0
+    hooks:
+      - id: isort
+        exclude: __init__.py
+        args: [ --profile, black, --filter-files ]
