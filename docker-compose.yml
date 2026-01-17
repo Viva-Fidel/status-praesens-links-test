@@ -52,6 +52,24 @@ services:
       - "8000:8000"
     networks:
       - status-praesens-test-network
+    volumes:
+     - ./:/app
+
+  celery:
+    container_name: celery
+    build:
+      context: .
+    command: celery -A link_shortener worker --loglevel=info
+    working_dir: /app
+    env_file:
+      - .env
+    depends_on:
+      - backend
+      - redis
+    volumes:
+      - ./:/app
+    networks:
+      - status-praesens-test-network
 
 volumes:
   postgres_data:
